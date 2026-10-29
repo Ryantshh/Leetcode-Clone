@@ -4,6 +4,12 @@ import ForgetPasswordVerificationEmail from "../../emails/ForgetPasswordEmail";
 
 
 export const sendForgetPasswordVerificationEmail = async (email: string, username: string, verifyCode: string): Promise<ApiResponse> => {
+    // Local development without a mail provider: the code is the console line.
+    if (!process.env.RESEND_API_KEY) {
+        console.info(`[local] password reset code for ${email}: ${verifyCode}`);
+        return { success: true, message: "Reset code printed to the server console" };
+    }
+
     try {
         await resend.emails.send({
             from: 'onboarding@resend.dev',

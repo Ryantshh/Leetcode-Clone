@@ -71,6 +71,31 @@ npm run dev
 ```
 The application will be accessible at http://localhost:3000.
 
+### Running fully local (no external APIs)
+
+Code execution runs on this machine instead of the hosted Judge0 API, and MongoDB
+runs in Docker, so no API keys are needed. Requires Docker Desktop running, plus
+Python 3 for the problem builder.
+
+```bash
+npm run local
+```
+
+That one command starts MongoDB, waits for it to accept connections, seeds the 150
+study-plan problems, and starts the dev server. Sign-up verification codes print to
+the terminal rather than being emailed while `RESEND_API_KEY` is unset, and the AI
+tab stays idle without `GEMINI_API_KEY`.
+
+Other scripts:
+
+| Command | Does |
+| --- | --- |
+| `npm run seed` | Seeds problems only. Idempotent; add `-- --admin you@example.com` to grant admin. |
+| `npm run problems` | Rebuilds `scripts/problems.json` from `scripts/problemdata/`, regenerating and cross-checking every expected output. |
+
+Python, JavaScript, C, C++ and Java are supported; the C, C++ and Java paths need
+`gcc`, `g++` and `javac` installed and on PATH.
+
 ## API Documentation
  For API documentation [**click here**](https://github.com/Avijit200318/Leetcode-Clone/blob/main/src/app/api/readme.md)
 

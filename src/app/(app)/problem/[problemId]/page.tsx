@@ -50,9 +50,35 @@ export default function page() {
   const [codeOutput, setCodeOutput] = useState<Judge0SubmissionResult[] | null>(null);
   const [submissionOutput, setSubmissionOutput] = useState<codeSubmissionResultType | null>(null);
 
+  const [loadedDraftKey, setLoadedDraftKey] = useState<string>("");
+  const draftKey = `draft:${problemId}:${selectedLanguage}`;
+
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  useEffect(() => {
+    if (!mounted) return;
+    let savedDraft = "";
+    try {
+      savedDraft = localStorage.getItem(draftKey) ?? "";
+    } catch {
+      savedDraft = "";
+    }
+    setSourceCode(savedDraft);
+    setLoadedDraftKey(draftKey);
+  }, [mounted, draftKey]);
+
+  useEffect(() => {
+    // Skip the commit where the key has changed but the editor still holds the
+    // previous language's code, otherwise it overwrites the incoming draft.
+    if (!mounted || loadedDraftKey !== draftKey) return;
+    try {
+      localStorage.setItem(draftKey, sourceCode);
+    } catch {
+      // Blocked storage: drafts just do not persist.
+    }
+  }, [mounted, draftKey, loadedDraftKey, sourceCode]);
 
   useEffect(() => {
     const fetchProblemDetails = async () => {

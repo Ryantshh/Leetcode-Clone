@@ -4,6 +4,9 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
+    "local": "docker compose up -d --wait && npm run seed && next dev --turbopack",
+    "seed": "node --env-file=.env.local scripts/seed-problems.mjs",
+    "problems": "python -I scripts/build_problems.py",
     "build": "next build --turbopack",
     "start": "next start",
     "lint": "eslint"

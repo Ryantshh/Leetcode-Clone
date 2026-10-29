@@ -1,5 +1,3 @@
-import {Document, model, models, Schema, Types} from "mongoose";
+import { Document } from "mongoose";
 
-export interface ISimilarQuestion extends Document {
-    
-}
+export type ISimilarQuestion = Document;

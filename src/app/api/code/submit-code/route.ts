@@ -1,5 +1,6 @@
+import { Types } from "mongoose";
 import { connectToDb } from "@/lib/dbConnect";
-import { runJudge0Batch } from "@/lib/judge0ApiFunction";
+import { runCodeLocally } from "@/lib/runCodeLocally";
 import problemModel from "@/models/Problem";
 import submissionModel from "@/models/Submission";
 import userModel from "@/models/User";
@@ -42,8 +43,8 @@ export async function POST(req: NextRequest) {
             }, { status: 400 });
         }
 
-        // run code using judge api
-        const apiResponse = await runJudge0Batch(sourceCode, languageId, testCases);
+        // run code locally
+        const apiResponse = await runCodeLocally(sourceCode, languageId, testCases);
 
         if (!apiResponse.success) {
             console.log("Error in api response: ", apiResponse.result);
@@ -59,7 +60,7 @@ export async function POST(req: NextRequest) {
 
         for (let i = 0; i < apiResponse.result.length; i++) {
             sumOfTime += parseFloat(apiResponse.result[i].time) || 0;
-            sumOfMemory += parseInt(apiResponse.result[i].memory) || 0;
+            sumOfMemory += apiResponse.result[i].memory || 0;
             if (apiResponse.result[i].status.description !== "Accepted") {
                 currentStatus = apiResponse.result[i].status.description;
                 break;
@@ -105,8 +106,15 @@ export async function POST(req: NextRequest) {
         }
 
         user.submissions.push(newSubmission._id);
-        user.solvedQuestions.push(problemId);
-        user.solvedProblems = user.solvedProblems + 1;
+
+        // Only an accepted, not-yet-solved problem counts towards the solved total.
+        const solvedQuestionIds = user.solvedQuestions as Types.ObjectId[];
+        const isAlreadySolved = solvedQuestionIds.some((solvedId) => solvedId.toString() === problemId);
+
+        if (currentStatus === "Accepted" && !isAlreadySolved) {
+            user.solvedQuestions.push(problemId);
+            user.solvedProblems = user.solvedProblems + 1;
+        }
         await user.save();
 
         return NextResponse.json({

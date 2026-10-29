@@ -1,0 +1,19 @@
+# Local MongoDB for development. Data persists in the mongo-data volume.
+services:
+  mongo:
+    image: mongo:7
+    container_name: leetcode-clone-mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    # `compose up --wait` blocks on this, so the seed never races the database.
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')"]
+      interval: 3s
+      timeout: 5s
+      retries: 20
+
+volumes:
+  mongo-data:

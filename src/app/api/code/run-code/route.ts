@@ -1,6 +1,6 @@
 import { NextResponse, NextRequest } from "next/server";
 import { codeRunValidation } from "@/schemas/codeRunSchema";
-import { runJudge0Batch } from "@/lib/judge0ApiFunction";
+import { runCodeLocally } from "@/lib/runCodeLocally";
 import { getToken } from "next-auth/jwt";
 
 export async function POST(req: NextRequest) {
@@ -27,8 +27,8 @@ export async function POST(req: NextRequest) {
             }, { status: 400 });
         }
 
-        // call judge0 api
-        const response = await runJudge0Batch(sourceCode, languageId, testCases);
+        // run code locally
+        const response = await runCodeLocally(sourceCode, languageId, testCases);
 
         if (!response.success) {
             return NextResponse.json({

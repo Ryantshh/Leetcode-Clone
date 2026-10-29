@@ -55,7 +55,6 @@ export default function ProblemPageCodeEditor({ theme, selectedLanguage, setSele
     useEffect(() => {
         const changeLanguageCode = () => {
             setSelectedLanguageCode(coddingLanguages[selectedLanguage as coddingLanguagesType].apiId);
-            setSourceCode("");
         }
         changeLanguageCode();
     }, [selectedLanguage])
